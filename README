@@ -1,0 +1,21 @@
+Fuzzy Subversion Checkout
+=========================
+Brian Hetro <whee@smaertness.net>
+
+Description
+-----------
+`svncof' is a shell script wrapper for approximate matching of 
+"svn checkout" repository URLs.
+
+For example:
+# svncof r1.2 bug fixes
+Checking out svn://svn-server/foo/bar/r1.2/branches/bug-fixes...
+
+A	bug-fixes/baz.txt
+A	bug-fixes/quux.txt
+-- 8< --
+
+Requirements
+------------
+* Subversion
+* agrep, from libtre (http://www.laurikari.net/tre/)
