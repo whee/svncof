@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Copyright (c) 2009, Brian Hetro <whee@smaertness.net>
+
+# Verify agrep is available. If not, bail.
+
+# Check if there are any root URIs in ~/.svncof
+## None? Prompt for one.
+###
+###" This is your first usage of svncof. Specify a root URI to start with.
+###" e.g., svn://a-server/path/to/project/root:
+###"
+###" Root URI: _
+###"
+###" The URI <insert-uri> would complete results like these:
+###"
+###" ...list top five...
+###"
+###" Is this what you expect? [Y/n] _
+###
+### No? Try again.
+
+# svn ls root URIs, recursively, three deep. Gather these.
+
+# Do something like this to match URIs. These arguments are obviously incorrect.
+# agrep -i -E 100 -D 10 -I 1 -S 10 -B --color -s 'filter' (svn ls http://svn.collab.net/repos/svn/branches | sed 's#^#http://svn.collab.net/repos/svn/branches/#'|psub)
+
+# If more than one match, list a few and bail.
+##" '<user-input>' has # matches. Be more specific.
+##"
+##" ...list some matches...
+
+# If one match, use it. No prompts or delays.
