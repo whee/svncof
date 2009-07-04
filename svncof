@@ -2,6 +2,8 @@
 # Copyright (c) 2009, Brian Hetro <whee@smaertness.net>
 
 # Verify agrep is available. If not, bail.
+type -P agrep &>/dev/null || \
+    { echo "Agrep from TRE is required. Aborting." >&2; exit 1; }
 
 # Check if there are any root URIs in ~/.svncof
 ## None? Prompt for one.
