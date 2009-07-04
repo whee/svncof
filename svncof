@@ -5,21 +5,36 @@
 type -P agrep &>/dev/null || \
     { echo "Agrep from TRE is required. Aborting." >&2; exit 1; }
 
+function repo_list
+{
+    for d in $(svn ls $1 | grep '/$'); do
+	svn ls $1/$d | sed -e "s#^#$1/$d#"
+    done | grep '/$'
+}
+
+function get_rooturi
+{
+ echo "This is your first usage of svncof. Specify a root URI to start with."
+ echo "e.g., svn://a-server/path/to/project/root:"
+ echo
+ read -e -p "Root URI: " ROOTURI
+ echo
+ echo "The URI ${ROOTURI} would complete results like these:"
+ echo
+ repo_list ${ROOTURI} | head -n 5
+}
+
 # Check if there are any root URIs in ~/.svncof
+if ! test -s ~/.svncof; then
 ## None? Prompt for one.
-###
-###" This is your first usage of svncof. Specify a root URI to start with.
-###" e.g., svn://a-server/path/to/project/root:
-###"
-###" Root URI: _
-###"
-###" The URI <insert-uri> would complete results like these:
-###"
-###" ...list top five...
-###"
-###" Is this what you expect? [Y/n] _
-###
-### No? Try again.
+    while test "${USEREXPECTED}" != "y" -a "${USEREXPECTED}" != "Y"; do
+	get_rooturi
+	echo
+	read -e -p "Is this what you expect? [y/N] " USEREXPECTED
+	echo
+    done
+    echo "${ROOTURI}" > ~/.svncof
+fi
 
 # svn ls root URIs, recursively, three deep. Gather these.
 
