@@ -7,9 +7,11 @@ type -P agrep &>/dev/null || \
 
 function repo_list
 {
-    for d in $(svn ls $1 | grep '/$'); do
-	svn ls $1/$d | sed -e "s#^#$1/$d#"
-    done | grep '/$'
+    for repo in "$@"; do
+	for d in $(svn ls ${repo} | grep '/$'); do
+	    svn ls ${repo}/$d | sed -e "s#^#${repo}/$d#"
+	done | grep '/$'
+    done
 }
 
 function get_rooturi
@@ -36,14 +38,32 @@ if ! test -s ~/.svncof; then
     echo "${ROOTURI}" > ~/.svncof
 fi
 
-# svn ls root URIs, recursively, three deep. Gather these.
+PATHLIST=$(mktemp -t svncof.XXXXXXXXXX) || \
+    { echo "Could not create temporary file. Aborting." >&2; exit 1; }
+RESULT=$(mktemp -t svncof.XXXXXXXXXX) || \
+    { echo "Could not create temporary file. Aborting." >&2; exit 1; }
 
-# Do something like this to match URIs. These arguments are obviously incorrect.
-# agrep -i -E 100 -D 10 -I 1 -S 10 -B --color -s 'filter' (svn ls http://svn.collab.net/repos/svn/branches | sed 's#^#http://svn.collab.net/repos/svn/branches/#'|psub)
+repo_list $(cat ~/.svncof) > ${PATHLIST}
 
-# If more than one match, list a few and bail.
-##" '<user-input>' has # matches. Be more specific.
-##"
-##" ...list some matches...
+agrep -i -E 100 -D 10 -I 1 -S 10 -B "$*" ${PATHLIST} > ${RESULT}
 
-# If one match, use it. No prompts or delays.
+rm -f ${PATHLIST}
+
+NUMRESULTS=$(wc -l <${RESULT})
+
+if test ${NUMRESULTS} -eq 0; then
+    echo "No path matched. Be less specific."
+    exit 3
+fi
+
+if test ${NUMRESULTS} -gt 1; then
+    echo "More than one path matched. Be more specific."
+    echo
+    cat ${RESULT}
+    exit 2
+fi
+
+COPATH=$(cat ${RESULT})
+rm -f ${RESULT}
+
+svn checkout ${COPATH}
