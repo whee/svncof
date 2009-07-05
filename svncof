@@ -38,17 +38,24 @@ if ! test -s ~/.svncof; then
     echo "${ROOTURI}" > ~/.svncof
 fi
 
+# Need a couple of temporary files for the svn repo path list, and any
+# resulting matches. Agrep's -B option really doesn't like anything
+# other than a plain file.
 PATHLIST=$(mktemp -t svncof.XXXXXXXXXX) || \
     { echo "Could not create temporary file. Aborting." >&2; exit 1; }
 RESULT=$(mktemp -t svncof.XXXXXXXXXX) || \
     { echo "Could not create temporary file. Aborting." >&2; exit 1; }
 
+# Generate a list of possible paths.
 repo_list $(cat ~/.svncof) > ${PATHLIST}
 
+# Match the user's input filter against the possible paths.
 agrep -i -E 100 -D 10 -I 1 -S 10 -B "$*" ${PATHLIST} > ${RESULT}
 
 rm -f ${PATHLIST}
 
+# Only do anything if there is exactly one match. More than one result
+# needs a more specific input.
 NUMRESULTS=$(wc -l <${RESULT})
 
 if test ${NUMRESULTS} -eq 0; then
@@ -66,4 +73,7 @@ fi
 COPATH=$(cat ${RESULT})
 rm -f ${RESULT}
 
+# Finally, checkout the matched path.
+echo "Checking out ${COPATH}"
+echo
 svn checkout ${COPATH}
