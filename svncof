@@ -60,6 +60,7 @@ NUMRESULTS=$(wc -l <${RESULT})
 
 if test ${NUMRESULTS} -eq 0; then
     echo "No path matched. Be less specific."
+    rm -f ${RESULT}
     exit 3
 fi
 
@@ -67,6 +68,7 @@ if test ${NUMRESULTS} -gt 1; then
     echo "More than one path matched. Be more specific."
     echo
     cat ${RESULT}
+    rm -f ${RESULT}
     exit 2
 fi
 
