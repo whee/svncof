@@ -75,7 +75,16 @@ fi
 COPATH=$(cat ${RESULT})
 rm -f ${RESULT}
 
-# Finally, checkout the matched path.
-echo "Checking out ${COPATH}"
+# If we are inside an existing Subversion working copy, issue a switch
+# instead of a checkout.
+if test -d .svn; then
+    echo "Switching to ${COPATH}"
+    SVNOPERATION=switch
+else
+    echo "Checking out ${COPATH}"
+    SVNOPERATION=checkout
+fi
+
+# Finally, checkout or switch to the matched path.
 echo
-svn checkout ${COPATH}
+svn ${SVNOPERATION} ${COPATH}
