@@ -90,12 +90,22 @@ rm -f ${RESULT}
 # If we are inside an existing Subversion working copy, issue a switch
 # instead of a checkout.
 if test -d .svn; then
-    echo "Switching to ${COPATH}"
+    echo -n "Switching to ${COPATH}"
     SVNOPERATION=switch
 else
-    echo "Checking out ${COPATH}"
+    echo -n "Checking out ${COPATH}"
     SVNOPERATION=checkout
 fi
+
+# Wait ${INDECISIONDELAY} seconds to give some time to C-c if the path
+# is wrong.
+INDECISIONDELAY=3
+I=1
+while test $I -le ${INDECISIONDELAY}; do
+    echo -n "."
+    sleep 1
+    I=$(( I + 1 ))
+done
 
 # Finally, checkout or switch to the matched path.
 echo
